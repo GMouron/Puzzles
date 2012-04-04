@@ -3,7 +3,9 @@ Algorithm used is the lexicographic permutation generation as described by Knuth
 in the art of computer programming
 Pseudo code available here : http://www-cs-faculty.stanford.edu/~uno/fasc2b.ps.gz
 --}
-
+module Permutation
+( permL
+) where
 import qualified Data.List as List
 
 
