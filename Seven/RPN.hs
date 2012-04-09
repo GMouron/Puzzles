@@ -4,6 +4,10 @@ Did delibaretly try to stay away from http://learnyouahaskell.com/functionally-s
 for first version
 Will create improved version later
 --}
+module RPN
+( evaluateRPN
+) where
+
 evaluateRPN ::(Read a, Floating a) => String -> a
 evaluateRPN expr =  head . foldl calculate [] $ words expr
 
