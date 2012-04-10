@@ -20,3 +20,6 @@ Using the same type of operators [``+,-,*,/ and ()``], find the result 100 by us
 4. As a bonus, trying to convert the RPN notation into usual math notation ?
 
 __Final workflow is the same as described above, including translating back to usual math notation__
+_I found at least one bug, e.g. an expression such as ``7 1 7 / +`` is not being generated.
+I am not sure if it means that under some circumstances, you can't find a valid result when there is one.
+(see line 31 o Main.hs)_

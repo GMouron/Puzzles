@@ -27,6 +27,9 @@ main = do
 -- Note that here, we don't keep the expressions starting with an operator, that is because they are necessarily invalid
 	let allOperatorsCombi = foldl (\acc x -> acc ++ addAndAccumulateElement noOperator l x) [] startWithOperator
 -- Some expressions will be invalid, but they will just yield a Nothing by the RPN evaluation
+-- Note also that despite what I first thought, this does not cover all the possible (valid) RPN notations
+-- One obvious miss is things such as "7 1 7 / +" as I don't stack operators together
+-- For the problem at hand, it doesn't matter, could it in other circumstances ?
 	let allExpressions = intertwineLists <$> numberPerms <*> allOperatorsCombi
 
 -- This is all calculated expressions
