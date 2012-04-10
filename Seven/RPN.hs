@@ -8,27 +8,22 @@ module RPN
 ( evaluateRPN
 ) where
 
-evaluateRPN ::(Read a, Floating a) => String -> a
-evaluateRPN expr =  head . foldl calculate [] $ words expr
+evaluateRPN ::(Read a, Floating a) => String -> Maybe a
+evaluateRPN expr = let res =  foldl calculate [] $ words expr
+					in if(length res > 1) then Nothing else Just (head res)
 
-{--
-Had to do xs:x:y and x:y case separately, to handle the "stack" correctly
-Due to the x:read op
-Didn't dare to do read op:x, but should have, as it is correct if you handle the stack from the left
-Oh well ...
---}
 calculate :: (Read a, Floating a) => [a] -> String -> [a]
-calculate (xs:x:y:[]) op = xs:applyOp x y op
-calculate (x:y:[]) op = applyOp x y op
-calculate (x:[]) op = x:read op:[]
-calculate _ op = read op:[]
+calculate xs op
+	| length xs >= 2 = let subxs = init xs
+						in (init subxs) ++ applyOp (last subxs) (last xs) op
+	| otherwise = xs ++ [read op]
 
 applyOp :: (Read a, Floating a) => a -> a -> String -> [a]
 applyOp x y op
-    | op == "+" = x + y:[]
-    | op == "-" = x - y:[]
-    | op == "*" = x * y:[]
-    | op == "/" = x / y:[]
-    | otherwise = x:y:read op:[]
+    | op == "+" = [x + y]
+    | op == "-" = [x - y]
+    | op == "*" = [x * y]
+    | op == "/" = [x / y]
+    | otherwise = [x,y,read op]
 
 
