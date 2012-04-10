@@ -6,36 +6,27 @@ import Combination
 import RPN
 import Misc
 import Control.Applicative
+import qualified Data.Set as Set
 
 main = do
 -- "Constants" of our problem
-	let numbers = ["7","7","7","7","1"]
-	let noOperator = " "
-	let operators = [noOperator, " - ", " + ", " * ", " / "]
+	let numbers = [" 7 "," 7 "," 7 "," 7 "," 1 "]
+	let operators = [" - ", " + ", " * ", " / "]
 
 	let l = length numbers
 
--- All permutations of numbers (numbers can only appear once)
-	let numberPerms = permL numbers
--- All possible combinations of operators, they will then be mixed with the permutations of numbers
-	let operatorsCombi = combineN l operators
+-- All possible combinations of operators, for the number of operators we need
+	let operatorsCombi = combineN (l-1) operators
+-- Now we get all permutations of numbers and operators, with the operators being already all possible combinations
+-- This should fix previous bug with expressions not being generated such as "7 1 7 / +"
+-- Note that we also do a filtering step where we eliminate expressions we know are not correct
+	--let basicFilter :: [String] -> Bool
+	let basicFilter x =  not (x!!0 `elem` operators || x!!1 `elem` operators || x!!(l*2-2) `elem` numbers )
+	let allExpressions = foldl (\acc x -> acc ++ (filter basicFilter $ permL x)) [] (fmap (numbers ++) operatorsCombi)
 
---We keep the combinations that start with a "real" operator
-	let startWithOperator = filter (\x -> x!!0 /= noOperator) operatorsCombi
--- We then generate from those combinations variations that pushes those operators away
--- This will have as an effect to stack some numbers at the beginning
--- Note that here, we don't keep the expressions starting with an operator, that is because they are necessarily invalid
-	let allOperatorsCombi = foldl (\acc x -> acc ++ addAndAccumulateElement noOperator l x) [] startWithOperator
--- Some expressions will be invalid, but they will just yield a Nothing by the RPN evaluation
--- Note also that despite what I first thought, this does not cover all the possible (valid) RPN notations
--- One obvious miss is things such as "7 1 7 / +" as I don't stack operators together
--- For the problem at hand, it doesn't matter, could it in other circumstances ?
-	let allExpressions = intertwineLists <$> numberPerms <*> allOperatorsCombi
+-- We want the calculated expressions with value 100
+	let matching = filter (\x -> snd x == Just 100) (fmap notationAndCalculation allExpressions)
 
--- This is all calculated expressions
-	let calculateExpressions = fmap notationAndCalculation allExpressions
--- We want the ones with value 100
-	let matching = filter (\x -> snd x == Just 100) calculateExpressions
--- And we want them displayed nicely
-	let result = fmap (\x -> rpnToInfix (fst x)) matching
+-- And we want them displayed nicely, removing duplicates
+	let result = fmap rpnToInfix $ (Set.toList . Set.fromList) (fmap fst matching)
 	return result

@@ -19,3 +19,4 @@ notationAndCalculation :: [String] -> (String, Maybe Float)
 notationAndCalculation x = (expr, evaluateRPN expr) where expr = concat x
 
 
+
